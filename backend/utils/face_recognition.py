@@ -32,10 +32,32 @@ def generate_face_encoding(image_data: bytes, num_jitters: int = 1) -> Optional[
             print("[ERROR] Failed to decode image with cv2.imdecode")
             return None
         
-        print(f"[DEBUG] Image decoded successfully, shape: {image.shape}")
+        print(f"[DEBUG] Image decoded successfully, shape: {image.shape}, dtype: {image.dtype}")
         
-        # Convert BGR to RGB (face_recognition uses RGB)
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Ensure image is in the correct format (8-bit RGB)
+        # cv2.imdecode with IMREAD_COLOR returns BGR, but we need to handle edge cases
+        if len(image.shape) == 2:
+            # Grayscale image - convert to RGB
+            print("[DEBUG] Converting grayscale to RGB")
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:
+            # RGBA image - convert to RGB
+            print("[DEBUG] Converting RGBA to RGB")
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGRA2RGB)
+        elif image.shape[2] == 3:
+            # BGR image - convert to RGB
+            print("[DEBUG] Converting BGR to RGB")
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        else:
+            print(f"[ERROR] Unexpected image format with {image.shape[2]} channels")
+            return None
+        
+        # Ensure the image is 8-bit
+        if rgb_image.dtype != np.uint8:
+            print(f"[DEBUG] Converting image from {rgb_image.dtype} to uint8")
+            rgb_image = rgb_image.astype(np.uint8)
+        
+        print(f"[DEBUG] Final RGB image shape: {rgb_image.shape}, dtype: {rgb_image.dtype}")
         
         print("[DEBUG] Attempting face detection...")
         # Detect face locations - try with both HOG (default) and CNN models
