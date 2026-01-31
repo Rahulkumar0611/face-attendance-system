@@ -1,203 +1,191 @@
----
-title: Face Attendance System
-emoji: 🔍
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
-pinned: false
----
+# 🎯 Face Attendance System
 
-# 🎯 Face Recognition Attendance System
+An advanced AI-powered attendance management system using facial recognition technology. Built with FastAPI backend and React frontend, featuring real-time face detection, geolocation verification, and a beautiful glassmorphism UI.
 
-A modern, AI-powered attendance management system using advanced face recognition technology with GPS-based location verification. Built with **React + FastAPI + SQLite** featuring a stunning glassmorphism UI design.
+![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python)
+![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-![FaceAuth](https://img.shields.io/badge/AI-Face%20Recognition-blue)
-![Python](https://img.shields.io/badge/Python-3.10+-green)
-![React](https://img.shields.io/badge/React-18+-61DAFB)
-![FastAPI](https://img.shields.io/badge/FastAPI-Modern-009688)
+## ✨ Features
 
----
+### Core Features
+- 🔐 **Face Recognition** - Advanced dlib-based facial recognition with 128-dimension face encodings
+- 📍 **Geolocation Verification** - GPS-based location tracking for attendance validation
+- 📊 **Real-time Dashboard** - Live attendance stats with beautiful glassmorphism UI
+- 👤 **Student Management** - Register, edit, delete students with multiple face images
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
 
-## 🌟 Key Features
+### Technical Features
+- ⚡ **Async Backend** - FastAPI with async SQLAlchemy for high performance
+- 🔄 **WebSocket Support** - Real-time updates without page refresh
+- 🐳 **Docker Ready** - Easy deployment with Docker/Hugging Face Spaces
+- 🔒 **Admin Authentication** - Secure JWT-based admin panel access
 
-### 🔐 AI-Powered Face Recognition
-- Real-time face detection and recognition with 98%+ accuracy
-- Multi-face encoding support for improved reliability
-- Live camera feed with bounding box overlays
-- Confidence score display for each recognition
+## 🛠️ Tech Stack
 
-### 📍 GPS Location Verification
-- Geofencing to ensure attendance from authorized locations
-- Dual-coordinate verification (device GPS + image metadata)
-- Visual location matching status display
-- Interactive map integration with Leaflet
+| Component | Technology |
+|-----------|------------|
+| **Backend** | Python, FastAPI, SQLAlchemy, dlib, face_recognition |
+| **Frontend** | React, Vite, TailwindCSS, Framer Motion |
+| **Database** | SQLite (async with aiosqlite) |
+| **Face Detection** | dlib + face_recognition library |
+| **Deployment** | Docker, Hugging Face Spaces |
 
-### 👨‍💼 Admin Dashboard
-- Secure password-protected admin panel
-- Student registration with photo capture
-- Attendance history and analytics
-- System reset and student management tools
-
-### 🎨 Modern UI/UX
-- Glassmorphism design with smooth animations
-- Responsive design for all devices
-- Dark mode interface
-- Framer Motion animations throughout
-
----
-
-## 🏗️ Architecture
+## 📦 Project Structure
 
 ```
 face-attendance-system/
-├── backend/                 # FastAPI Python Backend
-│   ├── app.py              # Application entry point
+├── backend/
+│   ├── app.py              # FastAPI application entry
 │   ├── config.py           # Configuration settings
-│   ├── models.py           # SQLAlchemy ORM models
-│   ├── schemas.py          # Pydantic validation schemas
-│   ├── database.py         # Database connection
-│   ├── routes/             # API endpoints
-│   │   ├── admin.py        # Admin authentication routes
+│   ├── database.py         # Database setup
+│   ├── models.py           # SQLAlchemy models
+│   ├── schemas.py          # Pydantic schemas
+│   ├── routes/
+│   │   ├── admin.py        # Admin authentication
+│   │   ├── attendance.py   # Attendance marking/recognition
 │   │   ├── students.py     # Student CRUD operations
-│   │   └── attendance.py   # Attendance marking routes
-│   └── utils/              # Utility functions
-│       ├── face_recognition_utils.py  # Face AI logic
-│       └── security.py     # JWT & password hashing
-│
-├── frontend/               # React Frontend
+│   │   └── websocket.py    # WebSocket connections
+│   ├── utils/
+│   │   ├── auth.py         # JWT authentication
+│   │   ├── face_recognition.py  # Face detection/encoding
+│   │   ├── location.py     # Geolocation utilities
+│   │   └── storage.py      # File storage handlers
+│   └── requirements.txt
+├── frontend/
 │   ├── src/
-│   │   ├── components/     # UI components
-│   │   ├── pages/          # Page components
+│   │   ├── components/     # React components
 │   │   ├── hooks/          # Custom React hooks
-│   │   └── utils/          # API clients & animations
-│   └── public/             # Static assets
-│
-└── README.md               # This file
+│   │   ├── pages/          # Page components
+│   │   └── utils/          # Utility functions
+│   └── package.json
+├── Dockerfile              # Hugging Face deployment
+└── README.md
 ```
-
----
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.9+
 - Node.js 18+
-- Webcam for face recognition
+- CMake (for dlib compilation)
 
-### Installation
+### Backend Setup
 
-1. **Clone the repository**
 ```bash
-git clone https://github.com/MohammadFayasKhan/face-attendance-system.git
-cd face-attendance-system
-```
-
-2. **Setup Backend**
-```bash
+# Navigate to backend
 cd backend
+
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Run server
+uvicorn app:app --reload --port 8000
 ```
 
-3. **Setup Frontend**
+### Frontend Setup
+
 ```bash
+# Navigate to frontend
 cd frontend
+
+# Install dependencies
 npm install
-```
 
-4. **Run the Application**
-```bash
-# Terminal 1 - Backend
-cd backend
-source venv/bin/activate
-python -m uvicorn app:app --reload --port 8000
-
-# Terminal 2 - Frontend
-cd frontend
+# Run development server
 npm run dev
 ```
 
-5. **Access the Application**
-- Frontend: http://localhost:5173
-- API Docs: http://localhost:8000/docs
+The app will be available at `http://localhost:5173`
 
----
+## 🌐 Deployment
 
-## 📸 How It Works
+### Hugging Face Spaces (Backend)
 
-### 1. Student Registration
-1. Admin logs in with password `786`
-2. Navigate to Student Management
-3. Enter student details (Name, UID)
-4. Capture face photo via webcam
-5. System encodes facial features using 128-point embedding
+1. Create a new Space on Hugging Face with Docker SDK
+2. Push the backend with Dockerfile:
 
-### 2. Attendance Marking
-1. Student faces the camera on Dashboard
-2. System detects and recognizes face in real-time
-3. GPS location is verified against registered coordinates
-4. Attendance is marked with timestamp and location data
+```bash
+git push https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE main
+```
 
-### 3. Admin Controls
-- View today's attendance records
-- Download attendance reports
-- Reset daily attendance
-- Delete students from system
+### Vercel (Frontend)
 
----
+1. Connect your GitHub repository to Vercel
+2. Set environment variable:
+   ```
+   VITE_API_URL=https://your-space.hf.space
+   ```
+3. Deploy!
 
-## 🔧 API Endpoints
+## 📱 Usage
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/students/register` | Register new student with face |
-| `GET` | `/api/students` | Get all registered students |
-| `DELETE` | `/api/students/{id}` | Delete a student |
-| `POST` | `/api/attendance/mark` | Mark attendance with face |
-| `GET` | `/api/attendance/today` | Get today's attendance |
-| `POST` | `/api/admin/login` | Admin authentication |
+### Student Registration
+1. Navigate to the Dashboard
+2. Click "Register Student"
+3. Fill in student details (Name, ID)
+4. Capture multiple face images (recommended: 3-5)
+5. Submit registration
 
----
+### Mark Attendance
+1. Open the Dashboard
+2. Enable camera and location access
+3. Position your face in the frame
+4. Click "Capture & Mark Attendance"
+5. System verifies face and location
 
-## 🛡️ Security Features
+### Admin Panel
+1. Click "Admin" button
+2. Login with credentials (default: admin/admin123)
+3. Manage students, view attendance history
+4. Reset attendance records as needed
 
-- **JWT Authentication** for admin sessions
-- **Password Hashing** with bcrypt
-- **CORS Protection** for API endpoints
-- **Input Validation** with Pydantic schemas
-- **SQL Injection Prevention** via SQLAlchemy ORM
+## 🔌 API Endpoints
 
----
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/students/register` | POST | Register new student |
+| `/api/students/` | GET | List all students |
+| `/api/students/{id}` | PUT/DELETE | Update/Delete student |
+| `/api/attendance/mark` | POST | Mark attendance |
+| `/api/attendance/recognize` | POST | Real-time face recognition |
+| `/api/attendance/today` | GET | Today's attendance |
+| `/api/attendance/stats` | GET | Attendance statistics |
+| `/api/admin/login` | POST | Admin authentication |
 
-## 🎯 Use Cases
+## 🔧 Configuration
 
-1. **Educational Institutions** - Automated class attendance
-2. **Corporate Offices** - Employee check-in/check-out
-3. **Events & Conferences** - Attendee verification
-4. **Secure Facilities** - Access control logging
+### Environment Variables
 
----
+**Backend (`backend/config.py`):**
+```python
+SECRET_KEY=your-secret-key
+ALLOWED_ORIGINS=http://localhost:5173,https://yourdomain.com
+```
 
-## 👨‍💻 Developer
-
-**Mohammad Fayas Khan**
-
-- 📧 Email: fayaskhanmohammad@gmail.com
-- 💼 LinkedIn: [mohammadfayaskhan](https://www.linkedin.com/in/mohammadfayaskhan/)
-- 🐙 GitHub: [MohammadFayasKhan](https://github.com/MohammadFayasKhan)
-- 🏆 LeetCode: [fayaskhanx](https://leetcode.com/u/fayaskhanx/)
-- 📷 Instagram: [@fayaskhanx](https://www.instagram.com/fayaskhanx)
-
----
+**Frontend (`.env`):**
+```env
+VITE_API_URL=http://localhost:8000
+```
 
 ## 📄 License
 
-This project is open-source and available under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Mohammad Fayas Khan**
+
+- GitHub: [@MohammadFayasKhan](https://github.com/MohammadFayasKhan)
+- LinkedIn: [Mohammad Fayas Khan](https://www.linkedin.com/in/fayas-khan-fk/)
 
 ---
 
 <p align="center">
-  Built with ❤️ using React, FastAPI, and Face Recognition AI
+  Made with ❤️ using AI-powered Face Recognition
 </p>

@@ -4,45 +4,78 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
 # Build outputs
 dist/
 build/
 *.egg-info/
+.egg
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
 
-# Environment
+# Environment variables
 .env
 .env.local
 .env.*.local
+.env.production
 
-# IDE
+# IDE and Editor
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
 
-# OS
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Face data (sensitive)
+# Face data (sensitive - generated at runtime)
 backend/data/faces/*
-!backend/data/faces/.gitkeep
+backend/data/face_encodings/*
+backend/data/profile_images/*
+backend/data/attendance_snapshots/*
+!backend/data/**/.gitkeep
 
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.backup
 
-# Coverage
+# Coverage and testing
 coverage/
 .nyc_output/
+*.cover
+*.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+
+# Hugging Face model cache
+*.pkl
+
+# Misc
+.cache/
+*.lock
+!package-lock.json
