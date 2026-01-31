@@ -1,14 +1,13 @@
-fastapi>=0.109.0
-uvicorn>=0.27.0
-# face-recognition provided by base image
-opencv-python-headless>=4.9.0
-numpy>=1.24.0
-pillow>=10.0.0
-python-multipart>=0.0.6
-sqlalchemy>=2.0.0
-aiosqlite>=0.19.0
-websockets>=12.0
-geopy>=2.4.0
-python-dateutil>=2.8.0
-PyJWT>=2.8.0
-passlib[bcrypt]>=1.7.4
+fastapi
+uvicorn
+python-multipart
+sqlalchemy
+aiosqlite
+websockets
+geopy
+python-dateutil
+PyJWT
+passlib[bcrypt]
+pillow
+numpy
+opencv-python-headless
