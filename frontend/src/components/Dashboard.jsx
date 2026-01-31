@@ -129,20 +129,31 @@ export default function Dashboard({ onBack }) {
         }
     };
 
+    const handleAdminPanelClose = () => {
+        setShowAdminPanel(false);
+        // Refresh data when returning from admin panel
+        loadStats();
+        loadTodayAttendance();
+    };
+
     if (showAdminPanel) {
-        return <AdminPanel onClose={() => setShowAdminPanel(false)} />;
+        return <AdminPanel onClose={handleAdminPanelClose} />;
     }
+
+    const handleRegistrationClose = () => {
+        setShowRegistration(false);
+        // Refresh data when returning from registration
+        loadStats();
+        loadTodayAttendance();
+    };
 
     if (showRegistration) {
         return (
             <div className="min-h-screen bg-dark-950 pt-6 pb-12 px-6">
                 <div className="max-w-4xl mx-auto">
                     <StudentRegistration
-                        onClose={() => setShowRegistration(false)}
-                        onSuccess={() => {
-                            loadStats();
-                            setShowRegistration(false);
-                        }}
+                        onClose={handleRegistrationClose}
+                        onSuccess={handleRegistrationClose}
                     />
                 </div>
             </div>
