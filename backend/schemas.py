@@ -8,14 +8,14 @@ from models import AttendanceStatus
 class StudentCreate(BaseModel):
     """Schema for creating a student."""
     name: str = Field(..., min_length=1, max_length=100)
-    email: EmailStr
+    email: Optional[EmailStr] = None  # Made optional
     enrollment_id: str = Field(..., min_length=1, max_length=50)
 
 class StudentResponse(BaseModel):
     """Schema for student response."""
     id: int
     name: str
-    email: str
+    email: Optional[str] = None  # Made optional
     enrollment_id: str
     role: Optional[str] = "Student"
     profile_image_path: Optional[str] = None
