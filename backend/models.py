@@ -17,7 +17,7 @@ class Student(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=True, index=True)  # Optional email
     enrollment_id = Column(String, unique=True, nullable=False, index=True)
     role = Column(String, nullable=False, default="Student")  # Student, Engineer, Faculty, etc.
     face_encoding_path = Column(String, nullable=True)
