@@ -1,10 +1,11 @@
-# Use Python 3.10
-FROM python:3.10-slim
+# Use Python 3.9 (Better compatibility for dlib/face_recognition wheels)
+FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies for dlib and opencv
+# We need build-essential and cmake for dlib compilation
 RUN apt-get update && apt-get install -y \
     cmake \
     build-essential \
@@ -14,16 +15,24 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-dev \
     libgl1 \
     libglib2.0-0 \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend requirements first (for caching)
-COPY backend/requirements.txt requirements.txt
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install Python dependencies
-# Pre-install cmake/numpy to help dlib build
+# Install core heavy dependencies separately to avoid cache busts and timeouts
+# Pre-install cmake and numpy to facilitate dlib build
 RUN pip install --no-cache-dir cmake numpy
 
-# Install dependencies
+# Install dlib explicitly first (this is the heaviest step)
+# Using verbose to see logs if it fails
+RUN pip install --no-cache-dir dlib
+
+# Copy backend requirements
+COPY backend/requirements.txt requirements.txt
+
+# Install remaining dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire backend code
