@@ -226,13 +226,36 @@ def detect_face_in_image(image_data: bytes) -> bool:
     try:
         nparr = np.frombuffer(image_data, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
+        if image is None:
+            print("[ERROR] detect_face_in_image: Failed to decode image")
+            return False
+        
+        # Handle different image formats (same as generate_face_encoding)
+        if len(image.shape) == 2:
+            # Grayscale
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:
+            # RGBA
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGRA2RGB)
+        elif image.shape[2] == 3:
+            # BGR
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        else:
+            print(f"[ERROR] detect_face_in_image: Unexpected image format with {image.shape[2]} channels")
+            return False
+        
+        # Ensure 8-bit
+        if rgb_image.dtype != np.uint8:
+            rgb_image = rgb_image.astype(np.uint8)
         
         face_locations = face_recognition.face_locations(rgb_image)
         return len(face_locations) > 0
         
     except Exception as e:
         print(f"Error detecting face: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def detect_face_with_box(image_data: bytes) -> Optional[Tuple[np.ndarray, Tuple[int, int, int, int]]]:
@@ -248,7 +271,23 @@ def detect_face_with_box(image_data: bytes) -> Optional[Tuple[np.ndarray, Tuple[
     try:
         nparr = np.frombuffer(image_data, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
+        if image is None:
+            return None
+        
+        # Handle different image formats
+        if len(image.shape) == 2:
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGRA2RGB)
+        elif image.shape[2] == 3:
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        else:
+            return None
+        
+        # Ensure 8-bit
+        if rgb_image.dtype != np.uint8:
+            rgb_image = rgb_image.astype(np.uint8)
         
         # Detect face locations
         face_locations = face_recognition.face_locations(rgb_image)
