@@ -24,21 +24,23 @@ def generate_face_encoding(image_data: bytes, num_jitters: int = 1) -> Optional[
     try:
         print(f"[DEBUG] Attempting to decode image, size: {len(image_data)} bytes")
         
-        # Use PIL instead of OpenCV - PIL creates native RGB arrays that dlib accepts
-        from PIL import Image as PILImage
+        # Use face_recognition's official image loading method
         import io
+        image_file = io.BytesIO(image_data)
         
-        pil_image = PILImage.open(io.BytesIO(image_data))
-        print(f"[DEBUG] PIL opened image: mode={pil_image.mode}, size={pil_image.size}")
-        
-        # Convert to RGB if needed
-        if pil_image.mode != 'RGB':
-            print(f"[DEBUG] Converting from {pil_image.mode} to RGB")
-            pil_image = pil_image.convert('RGB')
-        
-        # Convert to numpy array - PIL images are already in RGB format
-        rgb_image = np.array(pil_image, dtype=np.uint8)
-        print(f"[DEBUG] PIL to numpy: shape={rgb_image.shape}, dtype={rgb_image.dtype}")
+        try:
+            rgb_image = face_recognition.load_image_file(image_file)
+            print(f"[DEBUG] face_recognition.load_image_file succeeded: shape={rgb_image.shape}, dtype={rgb_image.dtype}")
+        except Exception as load_error:
+            print(f"[ERROR] face_recognition.load_image_file failed: {load_error}")
+            from PIL import Image as PILImage
+            image_file.seek(0)
+            pil_image = PILImage.open(image_file)
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+            rgb_image = np.asarray(pil_image, dtype=np.uint8, order='C')
+            if not rgb_image.flags['C_CONTIGUOUS']:
+                rgb_image = np.ascontiguousarray(rgb_image, dtype=np.uint8)
         
         print("[DEBUG] Attempting face detection...")
         # Detect face locations - try with both HOG (default) and CNN models
@@ -207,28 +209,33 @@ def detect_face_in_image(image_data: bytes) -> bool:
     try:
         print(f"[DEBUG] detect_face_in_image: Received {len(image_data)} bytes")
         
-        # Use PIL instead of OpenCV - PIL creates native RGB arrays that dlib accepts
-        from PIL import Image as PILImage
+        # Use face_recognition's official image loading method
+        # This handles all the image format conversions internally
         import io
+        import tempfile
         
-        pil_image = PILImage.open(io.BytesIO(image_data))
-        print(f"[DEBUG] PIL opened image: mode={pil_image.mode}, size={pil_image.size}")
+        # face_recognition.load_image_file expects a file path or file object
+        # Create a temporary file-like object
+        image_file = io.BytesIO(image_data)
         
-        # Convert to RGB if needed
-        if pil_image.mode != 'RGB':
-            print(f"[DEBUG] Converting from {pil_image.mode} to RGB")
-            pil_image = pil_image.convert('RGB')
+        try:
+            # Use the official face_recognition image loader
+            rgb_image = face_recognition.load_image_file(image_file)
+            print(f"[DEBUG] face_recognition.load_image_file succeeded: shape={rgb_image.shape}, dtype={rgb_image.dtype}")
+        except Exception as load_error:
+            print(f"[ERROR] face_recognition.load_image_file failed: {load_error}")
+            # Fallback to PIL
+            from PIL import Image as PILImage
+            image_file.seek(0)
+            pil_image = PILImage.open(image_file)
+            print(f"[DEBUG] PIL fallback: mode={pil_image.mode}, size={pil_image.size}")
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+            rgb_image = np.asarray(pil_image, dtype=np.uint8, order='C')
+            if not rgb_image.flags['C_CONTIGUOUS']:
+                rgb_image = np.ascontiguousarray(rgb_image, dtype=np.uint8)
         
-        # Convert to numpy array - PIL images are already in RGB format
-        rgb_image = np.array(pil_image, dtype=np.uint8)
-        print(f"[DEBUG] PIL to numpy: shape={rgb_image.shape}, dtype={rgb_image.dtype}, contiguous={rgb_image.flags['C_CONTIGUOUS']}")
-        
-        # Verify it's the right format
-        if len(rgb_image.shape) != 3 or rgb_image.shape[2] != 3:
-            print(f"[ERROR] Unexpected shape after PIL conversion: {rgb_image.shape}")
-            return False
-        
-        print(f"[DEBUG] Final image ready for dlib - shape: {rgb_image.shape}, dtype: {rgb_image.dtype}")
+        print(f"[DEBUG] Final image - shape: {rgb_image.shape}, dtype: {rgb_image.dtype}, contiguous: {rgb_image.flags['C_CONTIGUOUS']}")
         
         face_locations = face_recognition.face_locations(rgb_image)
         print(f"[DEBUG] detect_face_in_image: Found {len(face_locations)} faces")
@@ -251,18 +258,21 @@ def detect_face_with_box(image_data: bytes) -> Optional[Tuple[np.ndarray, Tuple[
         Tuple of (face_encoding, (top, right, bottom, left)) or None if no face
     """
     try:
-        # Use PIL instead of OpenCV - PIL creates native RGB arrays that dlib accepts
-        from PIL import Image as PILImage
+        # Use face_recognition's official image loading method
         import io
+        image_file = io.BytesIO(image_data)
         
-        pil_image = PILImage.open(io.BytesIO(image_data))
-        
-        # Convert to RGB if needed
-        if pil_image.mode != 'RGB':
-            pil_image = pil_image.convert('RGB')
-        
-        # Convert to numpy array - PIL images are already in RGB format
-        rgb_image = np.array(pil_image, dtype=np.uint8)
+        try:
+            rgb_image = face_recognition.load_image_file(image_file)
+        except Exception as load_error:
+            from PIL import Image as PILImage
+            image_file.seek(0)
+            pil_image = PILImage.open(image_file)
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+            rgb_image = np.asarray(pil_image, dtype=np.uint8, order='C')
+            if not rgb_image.flags['C_CONTIGUOUS']:
+                rgb_image = np.ascontiguousarray(rgb_image, dtype=np.uint8)
         
         # Detect face locations
         face_locations = face_recognition.face_locations(rgb_image)
