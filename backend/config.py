@@ -40,16 +40,12 @@ ALLOWED_LOCATIONS = [
     }
 ]
 
-# CORS settings - add your production domains
+# CORS settings
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
-    # Production domains (add your Vercel URL here)
-    "https://*.vercel.app",
-    "https://*.hf.space",
-    "*",  # Allow all for development - restrict in production
 ]
 
 # WebSocket settings

@@ -3,17 +3,24 @@
  */
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-const WS_URL = 'ws://localhost:8000/ws';
+// Dynamic WebSocket URL based on API URL
+const getWsUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    // Replace http/https with ws/wss
+    const wsUrl = apiUrl.replace(/^http/, 'ws');
+    return `${wsUrl}/ws`;
+};
 
 export const useWebSocket = () => {
     const [isConnected, setIsConnected] = useState(false);
     const [lastMessage, setLastMessage] = useState(null);
     const wsRef = useRef(null);
     const reconnectTimeoutRef = useRef(null);
+    const wsUrl = getWsUrl();
 
     const connect = useCallback(() => {
         try {
-            const ws = new WebSocket(WS_URL);
+            const ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
                 console.log('✅ WebSocket connected');
@@ -48,7 +55,7 @@ export const useWebSocket = () => {
         } catch (error) {
             console.error('Error creating WebSocket:', error);
         }
-    }, []);
+    }, [wsUrl]);
 
     const disconnect = useCallback(() => {
         if (reconnectTimeoutRef.current) {
