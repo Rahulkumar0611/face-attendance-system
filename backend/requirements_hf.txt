@@ -9,6 +9,8 @@ python-dateutil
 PyJWT
 passlib[bcrypt]
 pillow
+# Pin numpy to match conda-installed dlib
+numpy==1.26.4
 # face-recognition will use the conda-installed dlib
 face-recognition
 opencv-python-headless

@@ -250,27 +250,52 @@ def detect_face_in_image(image_data: bytes) -> bool:
         
         # Try MediaPipe first (more compatible)
         try:
+            print("[DEBUG] Importing MediaPipe...")
             import mediapipe as mp
-            mp_face_detection = mp.solutions.face_detection
+            print("[DEBUG] MediaPipe imported successfully")
             
+            mp_face_detection = mp.solutions.face_detection
+            print("[DEBUG] Creating FaceDetection instance...")
+            
+            # Try model_selection=0 first (short-range, better for selfies)
             with mp_face_detection.FaceDetection(
-                model_selection=1,  # 0 for short-range, 1 for full-range
-                min_detection_confidence=0.5
+                model_selection=0,  # 0 for short-range (within 2m), 1 for full-range (within 5m)
+                min_detection_confidence=0.3  # Lower threshold to catch more faces
             ) as face_detection:
+                print("[DEBUG] Running face detection with model_selection=0...")
                 results = face_detection.process(rgb_image)
                 
                 if results.detections:
-                    print(f"[DEBUG] MediaPipe detected {len(results.detections)} faces")
+                    print(f"[DEBUG] MediaPipe (model 0) detected {len(results.detections)} faces")
+                    for i, det in enumerate(results.detections):
+                        print(f"[DEBUG] Face {i}: confidence={det.score[0]:.2f}")
                     return True
                 else:
-                    print("[DEBUG] MediaPipe detected no faces")
+                    print("[DEBUG] MediaPipe (model 0) detected no faces, trying model 1...")
+            
+            # Try model_selection=1 (full-range) if model 0 didn't find any
+            with mp_face_detection.FaceDetection(
+                model_selection=1,
+                min_detection_confidence=0.3
+            ) as face_detection:
+                print("[DEBUG] Running face detection with model_selection=1...")
+                results = face_detection.process(rgb_image)
+                
+                if results.detections:
+                    print(f"[DEBUG] MediaPipe (model 1) detected {len(results.detections)} faces")
+                    return True
+                else:
+                    print("[DEBUG] MediaPipe (model 1) also detected no faces")
                     return False
                     
         except Exception as mp_error:
-            print(f"[WARNING] MediaPipe failed: {mp_error}, trying dlib fallback...")
+            print(f"[ERROR] MediaPipe failed with exception: {type(mp_error).__name__}: {mp_error}")
+            import traceback
+            traceback.print_exc()
             
             # Fallback to dlib/face_recognition
             try:
+                print("[DEBUG] Trying dlib fallback...")
                 image_file = io.BytesIO(image_data)
                 image_file.seek(0)
                 loaded_image = face_recognition.load_image_file(image_file)
