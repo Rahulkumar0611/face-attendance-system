@@ -1,39 +1,28 @@
-# Use Python 3.9 (Better compatibility for dlib/face_recognition wheels)
-FROM python:3.9-slim
+# Use a base image with dlib and face_recognition pre-installed
+# This avoids the memory-intensive compilation step that fails on Hugging Face
+FROM animcogn/face_recognition:cpu
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for dlib and opencv
-# We need build-essential and cmake for dlib compilation
+# Install system dependencies for OpenCV (libgl1)
 RUN apt-get update && apt-get install -y \
-    cmake \
-    build-essential \
-    libopenblas-dev \
-    liblapack-dev \
-    libx11-dev \
-    libgtk-3-dev \
     libgl1 \
     libglib2.0-0 \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-
-# Install core heavy dependencies separately to avoid cache busts and timeouts
-# Pre-install cmake and numpy to facilitate dlib build
-RUN pip install --no-cache-dir cmake numpy
-
-# Install dlib explicitly first (this is the heaviest step)
-# Using verbose to see logs if it fails
-RUN pip install --no-cache-dir dlib
+# Upgrade pip (good practice)
+RUN pip install --no-cache-dir --upgrade pip
 
 # Copy backend requirements
 COPY backend/requirements.txt requirements.txt
 
-# Install remaining dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Filter out face-recognition from requirements.txt because it's already in the base image
+# This prevents pip from trying to compile/reinstall it
+RUN grep -v "face-recognition" requirements.txt > requirements_final.txt
+
+# Install remaining dependencies from filtered requirements
+RUN pip install --no-cache-dir -r requirements_final.txt
 
 # Copy the entire backend code
 COPY backend/ .
