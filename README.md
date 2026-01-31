@@ -1,4 +1,4 @@
-# 🎯 Face Attendance System
+# 🧑‍💻 Face Recognition Attendance System
 
 An advanced AI-powered attendance management system using facial recognition technology. Built with FastAPI backend and React frontend, featuring real-time face detection, geolocation verification, and a beautiful glassmorphism UI.
 
