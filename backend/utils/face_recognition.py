@@ -22,30 +22,55 @@ def generate_face_encoding(image_data: bytes, num_jitters: int = 1) -> Optional[
         Face encoding array or None if no face detected
     """
     try:
+        print(f"[DEBUG] Attempting to decode image, size: {len(image_data)} bytes")
+        
         # Convert bytes to numpy array
         nparr = np.frombuffer(image_data, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
+        if image is None:
+            print("[ERROR] Failed to decode image with cv2.imdecode")
+            return None
+        
+        print(f"[DEBUG] Image decoded successfully, shape: {image.shape}")
+        
         # Convert BGR to RGB (face_recognition uses RGB)
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
-        # Detect face locations
-        face_locations = face_recognition.face_locations(rgb_image)
+        print("[DEBUG] Attempting face detection...")
+        # Detect face locations - try with both HOG (default) and CNN models
+        try:
+            face_locations = face_recognition.face_locations(rgb_image, model="hog")
+            print(f"[DEBUG] HOG face detection found {len(face_locations)} faces")
+        except Exception as hog_error:
+            print(f"[WARNING] HOG detection failed: {hog_error}, trying CNN...")
+            try:
+                face_locations = face_recognition.face_locations(rgb_image, model="cnn")
+                print(f"[DEBUG] CNN face detection found {len(face_locations)} faces")
+            except Exception as cnn_error:
+                print(f"[ERROR] CNN detection also failed: {cnn_error}")
+                return None
         
         if not face_locations:
+            print("[WARNING] No face locations detected in image")
             return None
         
+        print(f"[DEBUG] Generating face encodings with num_jitters={num_jitters}...")
         # Get face encodings (use first face if multiple detected)
         # num_jitters > 1 helps in getting a more stable encoding
         face_encodings = face_recognition.face_encodings(rgb_image, face_locations, num_jitters=num_jitters)
         
         if not face_encodings:
+            print("[WARNING] Face locations found but encoding generation failed")
             return None
-            
+        
+        print(f"[SUCCESS] Face encoding generated successfully, shape: {face_encodings[0].shape}")
         return face_encodings[0]
         
     except Exception as e:
-        print(f"Error generating face encoding: {e}")
+        print(f"[ERROR] Exception in generate_face_encoding: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def save_face_encoding(student_id: int, encoding: np.ndarray) -> str:
