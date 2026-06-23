@@ -23,22 +23,7 @@ FACE_RECOGNITION_TOLERANCE = 0.5  # Lower is more strict (0.0 - 1.0)
 FACE_CONFIDENCE_THRESHOLD = 0.5   # Minimum confidence to accept match
 
 # Location settings - Default allowed locations (can be modified)
-ALLOWED_LOCATIONS = [
-    {
-        "id": 1,
-        "name": "Main Campus",
-        "latitude": 31.248000,
-        "longitude": 75.708562,
-        "radius_meters": 100
-    },
-    {
-        "id": 2,
-        "name": "Library Building",
-        "latitude": 31.248000,
-        "longitude": 75.708562,
-        "radius_meters": 50
-    }
-]
+ALLOWED_LOCATIONS = []
 
 # CORS settings
 ALLOWED_ORIGINS = [

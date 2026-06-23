@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from database import init_db
-from routes import students, attendance, websocket, admin
+from routes import students, attendance, websocket, admin, api
 from config import ALLOWED_ORIGINS, DATA_DIR
 import uvicorn
 
@@ -37,6 +37,7 @@ app.include_router(students.router)
 app.include_router(attendance.router)
 app.include_router(websocket.router)
 app.include_router(admin.router)
+app.include_router(api.router)
 
 # Serve static files (images)
 app.mount("/data", StaticFiles(directory=str(DATA_DIR)), name="data")
