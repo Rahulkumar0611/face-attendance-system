@@ -81,7 +81,40 @@ app.post('/api/attendance/register-face', upload.single('image'), async (req, re
 
     if (!req.file) return res.status(400).json({ error: "No image provided" });
 
-    console.log(`Sending image to Python Service for Student: ${studentId}`);
+    // Step 1: Check if this face is already registered to someone else
+    const existingStudents = await Student.find({ 
+      tenantId: dummyTenantId, 
+      faceEncoding: { $exists: true, $not: { $size: 0 } } 
+    });
+
+    if (existingStudents.length > 0) {
+      const knownEncodings = {};
+      existingStudents.forEach(student => {
+        // Exclude the current student if they are just re-registering their own face
+        if (student.studentId !== studentId) {
+          knownEncodings[student.studentId] = student.faceEncoding;
+        }
+      });
+
+      if (Object.keys(knownEncodings).length > 0) {
+        const checkFormData = new FormData();
+        checkFormData.append('image', req.file.buffer, req.file.originalname || 'image.jpg');
+        checkFormData.append('known_encodings_json', JSON.stringify(knownEncodings));
+
+        const checkResponse = await axios.post(`${PYTHON_AI_URL}/api/face/recognize-face`, checkFormData, {
+          headers: checkFormData.getHeaders()
+        });
+
+        if (checkResponse.data.matched) {
+          const duplicateStudent = existingStudents.find(s => s.studentId === checkResponse.data.studentId);
+          return res.status(400).json({ 
+            error: `Face rejected! This face is already registered to ${duplicateStudent.studentName} (${duplicateStudent.studentId}).` 
+          });
+        }
+      }
+    }
+
+    console.log(`Sending image to Python Service to extract encoding for: ${studentId}`);
 
     const formData = new FormData();
     formData.append('image', req.file.buffer, req.file.originalname || 'image.jpg');
