@@ -86,7 +86,7 @@
 
         async function loadStudents() {
             try {
-                const response = await fetch('http://localhost:5000/api/students');
+                const response = await fetch('http://localhost:5001/api/students');
                 const students = await response.json();
                 
                 const tbody = document.getElementById('studentTableBody');
@@ -127,7 +127,7 @@
             resDiv.innerHTML = "Creating...";
 
             try {
-                const response = await fetch('http://localhost:5000/api/students', {
+                const response = await fetch('http://localhost:5001/api/students', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId: id, studentName: name })
@@ -164,7 +164,7 @@
             formData.append("studentId", studentId);
 
             try {
-                const response = await fetch('http://localhost:5000/api/attendance/register-face', {
+                const response = await fetch('http://localhost:5001/api/attendance/register-face', {
                     method: 'POST',
                     body: formData
                 });
@@ -190,7 +190,7 @@
             formData.append("image", blob, "face.jpg");
 
             try {
-                const response = await fetch('http://localhost:5000/api/attendance/take-face-attendance', {
+                const response = await fetch('http://localhost:5001/api/attendance/take-face-attendance', {
                     method: 'POST',
                     body: formData
                 });

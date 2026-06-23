@@ -231,7 +231,5 @@ app.post('/api/attendance/take-face-attendance', upload.single('image'), async (
 });
 
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Test ERP Node.js server running on http://localhost:${PORT}`);
-});
+const PORT = 5001;
+app.listen(PORT, () => console.log(`Test ERP Node.js server running on http://localhost:${PORT}`));
